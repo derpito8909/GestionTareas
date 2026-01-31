@@ -1,0 +1,105 @@
+<h2>Crear tarea</h2>
+
+<form [formGroup]="form" (ngSubmit)="create()" style="display:grid; gap:12px; max-width:720px;">
+  <fieldset style="border:1px solid #ddd; padding:12px; border-radius:10px;">
+    <legend><b>Datos principales</b></legend>
+
+    <input placeholder="Título" formControlName="title" />
+    <textarea placeholder="Descripción" formControlName="description" rows="3"></textarea>
+
+    <select formControlName="assignedUserId">
+      <option value="">(Selecciona usuario)</option>
+      @for (u of usersFacade.users(); track u.id) {
+        <option [value]="u.id">{{ u.name }}</option>
+      }
+    </select>
+  </fieldset>
+
+  <fieldset style="border:1px solid #ddd; padding:12px; border-radius:10px;">
+    <legend><b>Información adicional (JSON)</b></legend>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <label style="display:flex; gap:6px; align-items:center;">
+        Prioridad:
+        <select formControlName="prioridad">
+          <option value="Baja">Baja</option>
+          <option value="Media">Media</option>
+          <option value="Alta">Alta</option>
+        </select>
+      </label>
+
+      <label style="display:flex; gap:6px; align-items:center;">
+        Fecha estimada:
+        <input type="date" formControlName="fechaEstimada" />
+      </label>
+    </div>
+
+    <hr />
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <input [formControl]="tagInput" placeholder="Etiqueta (ej: CodeReview)" />
+      <button type="button" (click)="addTag()">Agregar etiqueta</button>
+    </div>
+
+    @if (etiquetas.controls.length > 0) {
+      <ul>
+        @for (c of etiquetas.controls; track $index) {
+          <li>
+            {{ c.value }}
+            <button type="button" (click)="removeTag($index)">Quitar</button>
+          </li>
+        }
+      </ul>
+    }
+
+    <hr />
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <input [formControl]="metaKeyInput" placeholder="Meta key (ej: repo)" />
+      <input [formControl]="metaValueInput" placeholder="Meta value (ej: core-api)" />
+      <button type="button" (click)="addMeta()">Agregar / Actualizar meta</button>
+    </div>
+
+    @if (metaInfo(); as msg) {
+      <p style="color:#1b5e20; margin:6px 0 0;">
+        {{ msg }}
+      </p>
+    }
+
+    @if (meta.controls.length > 0) {
+      <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+        <thead>
+        <tr style="text-align:left; border-bottom:1px solid #ddd;">
+          <th style="padding:6px;">Key</th>
+          <th style="padding:6px;">Value</th>
+          <th style="padding:6px;">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (row of meta.controls; track $index) {
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:6px;">{{ row.controls.key.value }}</td>
+              <td style="padding:6px;">{{ row.controls.value.value }}</td>
+              <td style="padding:6px;">
+                <button type="button" (click)="removeMeta($index)">Quitar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    <hr />
+
+    <label style="display:block; margin-top:8px;">
+      <b>Vista previa JSON:</b>
+    </label>
+    <textarea [value]="additionalPreview()" rows="4" readonly></textarea>
+  </fieldset>
+
+  <button type="submit" [disabled]="form.invalid || tasksFacade.loading()">Guardar</button>
+</form>
+
+<div style="margin:12px 0; max-width:720px;">
+  <app-api-error-banner [error]="tasksFacade.error()" />
+</div>

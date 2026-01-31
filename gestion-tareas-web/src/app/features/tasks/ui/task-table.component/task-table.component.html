@@ -1,0 +1,80 @@
+<table style="width:100%; border-collapse: collapse;">
+  <thead>
+  <tr style="text-align:left; border-bottom:1px solid #ddd;">
+    <th style="padding:8px;">Título</th>
+    <th style="padding:8px;">Estado</th>
+    <th style="padding:8px;">Asignado</th>
+    <th style="padding:8px;">Creación</th>
+    <th style="padding:8px;">Acciones</th>
+  </tr>
+  </thead>
+
+  <tbody>
+    @for (t of tasks(); track t.id) {
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:8px;">
+          <b>{{ t.title }}</b>
+          @if (t.description) {
+            <div style="opacity:.8; margin-top:4px;">{{ t.description }}</div>
+          }
+        </td>
+
+        <td style="padding:8px;">
+          {{ t.status }}
+        </td>
+
+        <td style="padding:8px;">
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span>{{ t.assignedUserName }}</span>
+
+            <select
+              [value]="selectedUserIdFor(t.id)"
+              (change)="onSelectUser(t.id, $any($event.target).value)">
+              <option value="">(cambiar)</option>
+              @for (u of users(); track u.id) {
+                <option [value]="u.id">{{ u.name }}</option>
+              }
+            </select>
+
+            <button
+              (click)="emitAssign(t.id)"
+              [disabled]="!selectedUserIdFor(t.id)">
+              Asignar
+            </button>
+          </div>
+        </td>
+
+        <td style="padding:8px;">
+          {{ t.createdAt | date:'yyyy-MM-dd HH:mm' }}
+        </td>
+
+        <td style="padding:8px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button
+              (click)="changeStatus.emit({ taskId: t.id, status: 'Pending' })"
+              [disabled]="t.status === 'Pending'">
+              Pending
+            </button>
+
+            <button
+              (click)="changeStatus.emit({ taskId: t.id, status: 'InProgress' })"
+              [disabled]="t.status === 'InProgress'">
+              InProgress
+            </button>
+
+            <button
+              (click)="changeStatus.emit({ taskId: t.id, status: 'Done' })"
+              [disabled]="t.status === 'Done' || t.status === 'Pending'">
+              Done
+            </button>
+          </div>
+
+          @if (t.status === 'Pending') {
+            <small style="opacity:.7;">(Done bloqueado desde Pending)</small>
+          }
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+

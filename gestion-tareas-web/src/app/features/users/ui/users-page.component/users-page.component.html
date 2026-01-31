@@ -1,0 +1,22 @@
+<h2>Usuarios</h2>
+
+<form [formGroup]="form" (ngSubmit)="create()" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+  <input placeholder="Nombre" formControlName="name" />
+  <input placeholder="Email" formControlName="email" />
+  <button type="submit" [disabled]="form.invalid || facade.loading()">Crear</button>
+  <button type="button" (click)="facade.load()" [disabled]="facade.loading()">Recargar</button>
+</form>
+
+<div style="margin:12px 0;">
+  <app-api-error-banner [error]="facade.error()" />
+</div>
+
+@if (facade.loading()) {
+  <p>Cargando…</p>
+} @else {
+  <ul>
+    @for (u of facade.users(); track u.id) {
+      <li>{{ u.name }} — {{ u.email }}</li>
+    }
+  </ul>
+}

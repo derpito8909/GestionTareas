@@ -1,0 +1,45 @@
+<h2>Tareas</h2>
+
+<form
+  [formGroup]="filters"
+  (ngSubmit)="load()"
+  style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;"
+>
+  <select formControlName="status">
+    <option value="">(Todos)</option>
+    <option value="Pending">Pending</option>
+    <option value="InProgress">InProgress</option>
+    <option value="Done">Done</option>
+  </select>
+
+  <select formControlName="userId">
+    <option value="">(Todos los usuarios)</option>
+    @for (u of usersFacade.users(); track u.id) {
+      <option [value]="u.id">{{ u.name }}</option>
+    }
+  </select>
+
+  <input placeholder="priority (JSON)" formControlName="priority" />
+  <input placeholder="tag (JSON)" formControlName="tag" />
+  <input type="date" formControlName="dueDateFrom" />
+  <input type="date" formControlName="dueDateTo" />
+
+  <button type="submit" [disabled]="tasksFacade.loading()">Filtrar</button>
+  <button type="button" (click)="reset()" [disabled]="tasksFacade.loading()">Limpiar</button>
+</form>
+
+<div style="margin:12px 0;">
+  <app-api-error-banner [error]="tasksFacade.error()" />
+</div>
+
+@if (tasksFacade.loading()) {
+  <p>Cargando…</p>
+} @else {
+  <app-task-table
+    [tasks]="tasksFacade.tasks()"
+    [users]="usersFacade.users()"
+    (changeStatus)="onChangeStatus($event.taskId, $event.status)"
+    (assign)="onAssign($event.taskId, $event.userId)"
+  />
+}
+
