@@ -1,11 +1,10 @@
 using GestionTareas.Domain.Entities;
-using GestionTareas.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GestionTareas.Infrastructure.Persistence;
 
-public class TaskItemConfiguration: IEntityTypeConfiguration<TaskItem>
+public sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
     public void Configure(EntityTypeBuilder<TaskItem> b)
     {
@@ -19,14 +18,15 @@ public class TaskItemConfiguration: IEntityTypeConfiguration<TaskItem>
 
         b.Property(x => x.Description)
             .HasMaxLength(1000);
-        
+
         b.Property(x => x.Status)
             .HasConversion<string>()
             .HasMaxLength(20)
             .IsRequired();
-
+        
         b.Property(x => x.AssignedUserId)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnName("UserId");
 
         b.HasOne(x => x.AssignedUser)
             .WithMany()
@@ -37,13 +37,14 @@ public class TaskItemConfiguration: IEntityTypeConfiguration<TaskItem>
             .HasDefaultValueSql("GETDATE()")
             .ValueGeneratedOnAdd();
 
+        // ✅ La columna real es AdditionalInfo
         b.Property(x => x.AdditionalInfoJson)
-            .HasColumnName("AdditionalInfoJson")
+            .HasColumnName("AdditionalInfo")
             .HasColumnType("nvarchar(max)");
-       
+
         b.HasIndex(x => new { x.AssignedUserId, x.Status });
         b.HasIndex(x => x.CreatedAt);
-        
+
         b.ToTable(t =>
         {
             t.HasCheckConstraint(
@@ -52,10 +53,10 @@ public class TaskItemConfiguration: IEntityTypeConfiguration<TaskItem>
             );
             
             t.HasCheckConstraint(
-                "CK_Tasks_AdditionalInfoJson_IsJson",
-                "[AdditionalInfoJson] IS NULL OR ISJSON([AdditionalInfoJson]) = 1"
+                "CK_Tasks_AdditionalInfo_IsJson",
+                "[AdditionalInfo] IS NULL OR ISJSON([AdditionalInfo]) = 1"
             );
-            
+
             t.HasCheckConstraint(
                 "CK_Tasks_Title_NotBlank",
                 "LEN(LTRIM(RTRIM([Title]))) > 0"

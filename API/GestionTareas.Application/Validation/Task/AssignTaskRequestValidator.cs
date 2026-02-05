@@ -8,6 +8,6 @@ public sealed class AssignTaskRequestValidator : AbstractValidator<AssignTaskReq
     public AssignTaskRequestValidator()
     {
         RuleFor(x => x.UserId)
-            .GreaterThan(0).WithErrorCode(ErrorCodes.TaskAssignedUserRequired).WithMessage(string.Empty);
+            .GreaterThan(0).WithErrorCode(ErrorCodes.TaskAssignedUserRequired);
     }
 }

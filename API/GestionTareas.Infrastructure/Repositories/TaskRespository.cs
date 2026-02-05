@@ -20,10 +20,11 @@ public sealed class TasksRepository : ITaskRepository
         return task;
     }
 
-    public Task<TaskItem?> GetByIdAsync(int taskId, CancellationToken ct)
+    public Task<TaskItem?> GetByIdAsync(int id, CancellationToken ct)
         => _db.Tasks
-            .Include(t => t.AssignedUser)
-            .FirstOrDefaultAsync(t => t.Id == taskId, ct);
+            .AsNoTracking()
+            .Include(t => t.AssignedUser) // ✅ para AssignedUserName
+            .FirstOrDefaultAsync(t => t.Id == id, ct);
 
     public async Task<IReadOnlyList<TaskItem>> ListAsync(TaskQuery query, CancellationToken ct)
     {

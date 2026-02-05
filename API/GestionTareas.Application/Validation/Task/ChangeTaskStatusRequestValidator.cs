@@ -1,5 +1,6 @@
 using FluentValidation;
 using GestionTareas.Application.Dtos;
+using GestionTareas.Domain.Errors;
 
 namespace GestionTareas.Application.Validation.Task;
 
@@ -9,6 +10,6 @@ public sealed class ChangeTaskStatusRequestValidator : AbstractValidator<ChangeT
     {
         RuleFor(x => x.Status)
             .IsInEnum()
-            .WithMessage(string.Empty);
+            .WithMessage(ErrorCodes.TaskInvalidTransition);
     }
 }

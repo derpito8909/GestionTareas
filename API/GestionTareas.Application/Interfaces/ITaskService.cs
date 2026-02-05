@@ -23,4 +23,6 @@ public interface ITaskService
     /// Cambiar estado de una tarea.
     /// </summary>
     Task<TaskResponse> ChangeStatusAsync(int taskId, ChangeTaskStatusRequest request, CancellationToken ct);
+    
+    Task<TaskResponse> GetByIdAsync(int id, CancellationToken ct);
 }

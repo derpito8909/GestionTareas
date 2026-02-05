@@ -1,10 +1,17 @@
+using System.Text.Json.Serialization;
 using GestionTareas.Api.Middlewares;
 using GestionTareas.Application;
 using GestionTareas.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);

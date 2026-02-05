@@ -52,6 +52,19 @@ public sealed class TaskService : ITaskService
 
         return Map(entity, assignedUser.Name);
     }
+    
+    public async Task<TaskResponse> GetByIdAsync(int id, CancellationToken ct)
+    {
+        if (id <= 0)
+            throw new NotFoundException(ErrorCodes.TaskNotFound);
+
+        var entity = await _tasks.GetByIdAsync(id, ct);
+
+        if (entity is null)
+            throw new NotFoundException(ErrorCodes.TaskNotFound);
+
+        return Map(entity, entity.AssignedUser.Name);
+    }
 
     public async Task<IReadOnlyList<TaskResponse>> ListAsync(TaskQuery query, CancellationToken ct)
     {
